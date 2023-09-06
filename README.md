@@ -1,8 +1,12 @@
 let pdfDocumentName = "Document";
-let docc = "";
 
-function generatePDF_DataFile() {
-  let imgTags = document.getElementsByTagName("img");
+// Create an array to store processed image URLs
+let processedImageURLs = [];
+
+function generatePDF_DataFile(imgTags) {
+  let docc = "";
+  console.log(processedImageURLs);
+  console.log(imgTags);
   let checkURLString = "blob:https://drive.google.com/";
   let validImgTagCounter = 0;
   for (i = 0; i < imgTags.length; i++) {
@@ -36,6 +40,11 @@ function generatePDF_DataFile() {
   anchorElement.download = pdfDocumentName + ".PDF_DataFile";
   document.body.appendChild(anchorElement);
   anchorElement.click();
+  
+ // After generating the PDF, add the processed image URLs to the array
+ for (let i = 0; i < imgTags.length; i++) {
+    processedImageURLs.push(imgTags[i].src);
+  }
 }
 
 let allElements = document.querySelectorAll("*");
@@ -70,13 +79,23 @@ if (chosenElement.scrollHeight > chosenElement.clientHeight) {
 
       if (remainingHeightToScroll >= chosenElement.clientHeight) {
         loopCounter++;
-        if (loopCounter % 200 === 0) {
-          generatePDF_DataFile();
+        if (loopCounter % 500 === 0) {
+          // Filter out images that have already been processed
+          let imgTags = document.getElementsByTagName("img");
+          imgTags = Array.from(imgTags).filter(img => !processedImageURLs.includes(img.src));
+          
+          // Call generatePDF_DataFile with the filtered imgTags
+          generatePDF_DataFile(imgTags);
         }
         myLoop(remainingHeightToScroll, scrollToLocation);
       } else {
         setTimeout(function () {
-          generatePDF_DataFile();
+           // Filter out images that have already been processed
+          let imgTags = document.getElementsByTagName("img");
+          imgTags = Array.from(imgTags).filter(img => !processedImageURLs.includes(img.src));
+          
+          // Call generatePDF_DataFile with the filtered imgTags
+          generatePDF_DataFile(imgTags);
         }, 1500);
       }
     }, 400);
@@ -86,6 +105,11 @@ if (chosenElement.scrollHeight > chosenElement.clientHeight) {
 } else {
   console.log("No Scroll");
   setTimeout(function () {
-    generatePDF_DataFile();
+    // Filter out images that have already been processed
+    let imgTags = document.getElementsByTagName("img");
+    imgTags = Array.from(imgTags).filter(img => !processedImageURLs.includes(img.src));
+    
+    // Call generatePDF_DataFile with the filtered imgTags
+    generatePDF_DataFile(imgTags);
   }, 1500);
 }
